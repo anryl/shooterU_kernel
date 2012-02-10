@@ -30,8 +30,8 @@
 #ifndef AVS_H
 #define AVS_H
 
-#define VOLTAGE_MIN  1000 /* mV */
-#define VOLTAGE_MAX  1250
+#define VOLTAGE_MIN  800 /* mV 1000 anryl*/
+#define VOLTAGE_MAX  1325 /*anryl 1250 1325*/
 #define VOLTAGE_STEP 25
 
 int __init avs_init(int (*set_vdd)(int), u32 freq_cnt, u32 freq_idx);

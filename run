@@ -1,8 +1,4 @@
-#make -j16 CONFIG_OVERCLOCK=y ARCH=arm CROSS_COMPILE=/home/CM/anryl/android-ndk-r5b/toolchains/arm-eabi-4.4.0/prebuilt/linux-x86/bin/arm-eabi- 
+make -j16 CONFIG_OVERCLOCK=y ARCH=arm
+find -iname '*.ko' -exec cp {} /home/anryl/build/system/lib/modules/ \;
+find -iname 'zImage' -exec cp {} /home/anryl/build/kernel/ \;
 
-make -j16 CONFIG_OVERCLOCK=y ARCH=arm CROSS_COMPILE=/home/anryl/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi- 
-
-
-
-#zImage
-#make -j4 ARCH=arm CROSS_COMPILE=arm-eabi- zImage
