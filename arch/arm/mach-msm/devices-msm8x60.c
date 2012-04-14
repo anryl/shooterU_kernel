@@ -902,13 +902,13 @@ struct kgsl_platform_data kgsl_pdata = {
 	.high_axi_2d = MSM_AXI_FLOW_2D_GPU_HIGH,
 #else
 	/* AXI rates in KHz */
-	.high_axi_3d = 200000,
-	.high_axi_2d = 160000,
+	.high_axi_3d = 220000, /*200000*/
+	.high_axi_2d = 176000, /*160000*/
 #endif
-	.max_grp2d_freq = 228571000,
+	.max_grp2d_freq = 228571000,/*228571000*/
 	.min_grp2d_freq = 228571000,
 	.set_grp2d_async = NULL, /* HW workaround, run Z180 SYNC @ 192 MHZ */
-	.max_grp3d_freq = 320000000,
+	.max_grp3d_freq = 320000000, /*320000000 352000000 not booting*/
 	.min_grp3d_freq = 266667000,
 	.set_grp3d_async = NULL,
 	.imem_clk_name = "imem_axi_clk",

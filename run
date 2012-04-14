@@ -1,4 +1,5 @@
 make -j16 CONFIG_OVERCLOCK=y ARCH=arm
-find -iname '*.ko' -exec cp {} /home/anryl/build/system/lib/modules/ \;
-find -iname 'zImage' -exec cp {} /home/anryl/build/kernel/ \;
+rm /home/anryl/build/10/system/lib/modules/*.ko
+find -iname '*.ko' -exec cp {} /home/anryl/build/10/system/lib/modules/ \;
+find -iname 'zImage' -exec cp {} /home/anryl/build/10/kernel/ \;
 

@@ -448,6 +448,7 @@ obj-$(CONFIG_MACH_VIGOR) += board-vigor-audio.o
 obj-$(CONFIG_MACH_VIGOR) += board-vigor-keypad.o
 obj-$(CONFIG_MACH_VIGOR) += htc_bdaddress.o htc_sleep_clk.o board-vigor-rfkill.o htc_fmtx_rfkill.o
 obj-$(CONFIG_MACH_VIGOR) += board-vigor-mmc.o board-vigor-wifi.o
+obj-$(CONFIG_FORCE_FAST_CHARGE)         += fastchg.o
 obj-$(CONFIG_MACH_RUBY) += board-ruby.o
 obj-$(CONFIG_MACH_RUBY) += board-ruby-audio.o
 obj-$(CONFIG_MACH_RUBY) += board-ruby-keypad.o

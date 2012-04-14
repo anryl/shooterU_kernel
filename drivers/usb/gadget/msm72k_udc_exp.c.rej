@@ -1,0 +1,87 @@
+--- drivers/usb/gadget/msm72k_udc_exp.c
++++ drivers/usb/gadget/msm72k_udc_exp.c
+@@ -2041,43 +2048,48 @@
+ 
+ static void charger_detect(struct usb_info *ui)
+ {
++	struct msm_otg *otg = to_msm_otg(ui->xceiv);
++	enum chg_type chg_type = USB_CHG_TYPE__INVALID;
++	unsigned long flags;
+ 	msleep(10);
+ 
+ 	/* detect shorted D+/D-, indicating AC power */
+-	if ((readl(USB_PORTSC) & PORTSC_LS) != PORTSC_LS) {
++	spin_lock_irqsave(&ui->lock, flags);
++	chg_type = usb_get_chg_type(ui);
++	spin_unlock_irqrestore(&ui->lock, flags);
++
++	atomic_set(&otg->chg_type, chg_type);
++
++	if (chg_type != USB_CHG_TYPE__WALLCHARGER) {
+ 		if (ui->connect_type == CONNECT_TYPE_USB) {
+ 			USB_INFO("USB charger is already detected\n");
++			return;
+ 		} else {
+ 			USB_INFO("not AC charger\n");
+ 			ui->connect_type = CONNECT_TYPE_UNKNOWN;
+-			queue_work(ui->usb_wq, &ui->notifier_work);
+-			queue_delayed_work(ui->usb_wq, &ui->chg_det,
+-					DELAY_FOR_CHECK_CHG);
+ 			mod_timer(&ui->ac_detect_timer, jiffies + (3 * HZ));
+ 		}
+ 	} else {
+-		if (ui->usb_id_pin_gpio != 0) {
+-			if (gpio_get_value(ui->usb_id_pin_gpio) == 0) {
+-				USB_INFO("9V AC charger\n");
+-				ui->connect_type = CONNECT_TYPE_9V_AC;
+-			} else {
+-				USB_INFO("AC charger\n");
+-				ui->connect_type = CONNECT_TYPE_AC;
+-			}
+-		} else {
+-			USB_INFO("AC charger\n");
+-			ui->connect_type = CONNECT_TYPE_AC;
+-		}
+-		queue_work(ui->usb_wq, &ui->notifier_work);
++		USB_INFO("AC charger\n");
++		ui->connect_type = CONNECT_TYPE_AC;
++
+ 		msleep(10);
+ 		if (ui->change_phy_voltage)
+ 			ui->change_phy_voltage(0);
++
++		/* charging current is not controlled by USB. just set 0 here */
++		otg_set_power(ui->xceiv, 0);
++		pm_runtime_put_sync(&ui->pdev->dev);
+ 	}
++	queue_work(ui->usb_wq, &ui->notifier_work);
+ }
+ 
+ static void charger_detect_by_9v_gpio(struct usb_info *ui)
+ {
+ 	int ac_9v_charger = 0;
++	struct msm_otg *otg = to_msm_otg(ui->xceiv);
++	enum chg_type chg_type = USB_CHG_TYPE__INVALID;
++	unsigned long flags;
+ 
+ 	msleep(10);
+ 	if (ui->configure_ac_9v_gpio)
+@@ -2087,10 +2099,17 @@
+ 	if (ui->configure_ac_9v_gpio)
+ 		ui->configure_ac_9v_gpio(0);
+ 
++	/* detect shorted D+/D-, indicating AC power */
++	spin_lock_irqsave(&ui->lock, flags);
++	chg_type = usb_get_chg_type(ui);
++	spin_unlock_irqrestore(&ui->lock, flags);
++
++	atomic_set(&otg->chg_type, chg_type);
++
+ 	if (ac_9v_charger) {
+ 		USB_INFO("9V AC charger\n");
+ 		ui->connect_type = CONNECT_TYPE_9V_AC;
+-	} else if ((readl(USB_PORTSC) & PORTSC_LS) == PORTSC_LS) {
++	} else if (chg_type == USB_CHG_TYPE__WALLCHARGER) {
+ 		if ((ui->usb_id_pin_gpio) &&
+ 				gpio_get_value(ui->usb_id_pin_gpio) == 0) {
+ 			USB_INFO("9V AC charger\n");
